@@ -3,6 +3,25 @@ from tkinter import Listbox, messagebox, PhotoImage
 from fpdf import FPDF
 from tkinter import ttk
 
+class PDf(FPDF):
+    def header(self):
+        self.set_font('Arial', 'B', 12)
+        self.cell(0, 10, 'Boleta de pedido', 0, 1, 'C')
+        self.ln(10)
+
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('Arial','I', 8)
+        self.cell(0, 10, f'Pagina{self.page_no()}', 0, 0, 'C')
+
+    def add_table_header(self):
+        self.set_font('Arial', 'I', 8)
+       
+
+
+
+
+
 class RestauranteApp(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -102,10 +121,10 @@ class RestauranteApp(ctk.CTk):
         ctk.CTkLabel(self.tab_pedidos, text="Gestión de Pedidos").pack(pady=10)
 
         # Cargar imágenes para los botones
-        self.hamburger_icon = PhotoImage(file="image/icono_hamburguesa_negra_64x64.png")  # Ruta a tu imagen
-        self.fries_icon = PhotoImage(file="image/icono_papas_fritas_64x64.png")  # Ruta a tu imagen
-        self.pepsi_icon = PhotoImage(file="image/icono_cola_64x64.png")  # Ruta a tu imagen
-        self.hotdog_icon = PhotoImage(file="image/icono_hotdog_sin_texto_64x64.png")  # Ruta a tu imagen
+        self.hamburger_icon = PhotoImage(file="image/hamburguesa.png")
+        self.fries_icon = PhotoImage(file="image/papas.png")  
+        self.pepsi_icon = PhotoImage(file="image/pepsi.png")  
+        self.hotdog_icon = PhotoImage(file="image/hotdog.png")  
 
         # Botones con iconos
         self.add_hamburger_btn = ctk.CTkButton(self.tab_pedidos, image=self.hamburger_icon, text="Hamburguesa", command=lambda: self.add_order("Hamburguesa"))
@@ -118,7 +137,7 @@ class RestauranteApp(ctk.CTk):
         self.add_pepsi_btn.pack(pady=10)
 
         self.add_hotdog_btn = ctk.CTkButton(self.tab_pedidos, image=self.hotdog_icon, text="Hotdog", command=lambda: self.add_order("Hotdog"))
-        self.add_hotdog_btn.pack(pady=10)
+        self.add_hotdog_btn.pack(padx=10)
 
         self.order_listbox = Listbox(self.tab_pedidos, selectmode="single")
         self.order_listbox.pack(expand=1, fill="both", pady=10)
@@ -151,10 +170,9 @@ class RestauranteApp(ctk.CTk):
         for name, quantity in self.orders.items():
             pdf.cell(200, 10, txt=f"{name} - {quantity}", ln=True)
 
-        pdf.output("receipt.pdf")
+        pdf.output("Boleta-Pedido.pdf")
         messagebox.showinfo("Generar Boleta", "Boleta generada correctamente como receipt.pdf.")
 
-# Inicializar la aplicación
 if __name__ == "__main__":
     app = RestauranteApp()
     app.mainloop()
