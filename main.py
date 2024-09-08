@@ -43,7 +43,7 @@ class RestauranteApp(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("Gestión de Restaurante")
-        self.geometry("800x600")
+        self.geometry("600x600")
         self.ingredients = {}
         self.orders = {}
 
@@ -58,7 +58,6 @@ class RestauranteApp(ctk.CTk):
         self.create_orders_tab()
 
     def create_ingredients_tab(self):
-        # Crear y ubicar los campos de entrada y botones
         self.ingredient_name_entry = ctk.CTkEntry(self.tab_ingredientes, placeholder_text="Nombre del Ingrediente")
         self.ingredient_name_entry.grid(row=0, column=0, padx=10, pady=10, sticky="w")
 
@@ -97,7 +96,7 @@ class RestauranteApp(ctk.CTk):
             if quantity <= 0:
                 raise ValueError
         except ValueError:
-            messagebox.showerror("Error", "La cantidad debe ser un número positivo.")
+            messagebox.showerror("Error", "La cantidad debe ser un numero positivo.")
             return
 
         self.ingredients[name] = quantity
@@ -144,17 +143,17 @@ class RestauranteApp(ctk.CTk):
         self.hotdog_icon = PhotoImage(file="image/hotdog.png")  
 
         # Botones con iconos
-        self.add_hamburger_btn = ctk.CTkButton(self.tab_pedidos, image=self.hamburger_icon, text="Hamburguesa", command=lambda: self.add_order("Hamburguesa"))
+        self.add_hamburger_btn = ctk.CTkButton(self.tab_pedidos, image=self.hamburger_icon, text="Hamburguesa", command=lambda: self.add_order("Hamburguesa", 2.500))
         self.add_hamburger_btn.pack(pady=10)
 
-        self.add_fries_btn = ctk.CTkButton(self.tab_pedidos, image=self.fries_icon, text="Papas Fritas", command=lambda: self.add_order("Papas Fritas"))
+        self.add_fries_btn = ctk.CTkButton(self.tab_pedidos, image=self.fries_icon, text="Papas Fritas", command=lambda: self.add_order("Papas Fritas", 1.500))
         self.add_fries_btn.pack(pady=10)
 
-        self.add_pepsi_btn = ctk.CTkButton(self.tab_pedidos, image=self.pepsi_icon, text="Pepsi", command=lambda: self.add_order("Pepsi"))
+        self.add_pepsi_btn = ctk.CTkButton(self.tab_pedidos, image=self.pepsi_icon, text="Pepsi", command=lambda: self.add_order("Pepsi", 1.200))
         self.add_pepsi_btn.pack(pady=10)
 
-        self.add_hotdog_btn = ctk.CTkButton(self.tab_pedidos, image=self.hotdog_icon, text="Hotdog", command=lambda: self.add_order("Hotdog"))
-        self.add_hotdog_btn.pack(padx=10)
+        self.add_hotdog_btn = ctk.CTkButton(self.tab_pedidos, image=self.hotdog_icon, text="Hotdog", command=lambda: self.add_order("Hotdog",2.000))
+        self.add_hotdog_btn.pack(pady=10)
 
         self.order_listbox = Listbox(self.tab_pedidos, selectmode="single")
         self.order_listbox.pack(expand=1, fill="both", pady=10)
@@ -163,12 +162,12 @@ class RestauranteApp(ctk.CTk):
         self.generate_receipt_btn = ctk.CTkButton(self.tab_pedidos, text="Generar Boleta", command=self.generate_receipt)
         self.generate_receipt_btn.pack(pady=10)
 
-    def add_order(self, item_name):
+    def add_order(self, item_name, price):
         quantity = 1  # Se puede ajustar según necesidad
         if item_name in self.orders:
-            self.orders[item_name] += quantity
+            self.orders[item_name]["quantity"] += quantity
         else:
-            self.orders[item_name] = quantity
+            self.orders[item_name] = {"quantity": quantity, "price": price}
 
         self.order_listbox.insert("end", f"{item_name} - {quantity}")
 
@@ -177,18 +176,20 @@ class RestauranteApp(ctk.CTk):
             messagebox.showerror("Error", "No hay pedidos para generar la boleta.")
             return
 
-        pdf = FPDF()
+        pdf = PDf()
         pdf.add_page()
-        pdf.set_font("Arial", size=12)
+        
+        pdf.add_table_header()
+        total = 0
 
-        pdf.cell(200, 10, txt="Boleta de Pedido", ln=True, align='C')
-        pdf.ln(10)
+        for item, details in self.orders.items():
+            subtotal = pdf.add_product(item, details["quantity"], details["price"])
+            total += subtotal
 
-        for name, quantity in self.orders.items():
-            pdf.cell(200, 10, txt=f"{name} - {quantity}", ln=True)
+        pdf.add_total(total)    
 
         pdf.output("Boleta-Pedido.pdf")
-        messagebox.showinfo("Generar Boleta", "Boleta generada correctamente como receipt.pdf.")
+        messagebox.showinfo("Generar Boleta", "Boleta generada correctamente como boleta-pedido.pdf.")
 
 if __name__ == "__main__":
     app = RestauranteApp()
