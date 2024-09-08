@@ -16,10 +16,27 @@ class PDf(FPDF):
 
     def add_table_header(self):
         self.set_font('Arial', 'I', 8)
-       
+        self.set_font('Arial', 'B', 12)
+        self.cell(80, 10, 'Producto', 1)
+        self.cell(30, 10, 'Cantidad', 1, 0, 'C')
+        self.cell(40, 10, 'Precio Unitario', 1, 0, 'C')
+        self.cell(40, 10, 'Subtotal', 1, 1, 'C')
 
 
+    def add_product(self, product, quantity, price):
+        self.set_font('Arial', '', 12)
+        subtotal = quantity * price
+        self.cell(80, 10, product, 1)
+        self.cell(30, 10, str(quantity), 1, 0, 'C')
+        self.cell(40, 10, f'{price:.2f}', 1, 0, 'C')
+        self.cell(40, 10, f'{subtotal:.2f}', 1, 1, 'C')
+        return subtotal
 
+
+    #agregar el total de la boleta
+    def add_total(self, total):
+        self.cell(150, 10, 'Total', 1, 0, 'R')
+        self.cell(40, 10, f'{total:.2f}', 1, 1, 'C')
 
 
 class RestauranteApp(ctk.CTk):
