@@ -158,15 +158,53 @@ class RestauranteApp(ctk.CTk):
     def create_orders_tab(self):
         ctk.CTkLabel(self.tab_pedidos, text="Gestión de Pedidos").pack(pady=10)
 
-        #########
-    def add_order(self, item_name, price):
-        ##########
+        self.order_tree = ttk.Treeview(self.tab_pedidos, columns=("Producto", "Cantidad", "Precio"), show="headings")
+        self.order_tree.heading("Producto", text="Producto")
+        self.order_tree.heading("Cantidad", text="Cantidad")
+        self.order_tree.heading("Precio", text="Precio")
+        self.order_tree.pack(expand=1, fill="both", pady=10)
+
+        self.delete_order_btn = ctk.CTkButton(self.tab_pedidos, text="Eliminar Pedido", command=self.delete_order)
+        self.delete_order_btn.pack(pady=10)
+
+        self.generate_receipt_btn = ctk.CTkButton(self.tab_pedidos, text="Generar Boleta", command=self.generate_receipt)
+        self.generate_receipt_btn.pack(pady=10)
+        
+    def add_order(self, product_name, price):
+        required_ingredients = {
+            "Hamburguesa": {"Pan": 1, "Carne": 1},
+            "Papas Fritas": {"Papa": 2},
+            "Pepsi": {"Pepsi": 1},
+            "Hotdog": {"Pan": 1, "Salchicha": 1},
+        }
+
+        if product_name not in required_ingredients:
+            return
+
+        for ingredient, qty in required_ingredients[product_name].items():
+            if self.ingredients.get(ingredient, 0) < qty:
+                messagebox.showerror("Error", f"No hay suficientes ingredientes para {product_name}.")
+                return
+
+        # Restar los ingredientes utilizados
+        for ingredient, qty in required_ingredients[product_name].items():
+            self.ingredients[ingredient] -= qty
+
+        # Agregar el pedido
+        quantity = 1
+        self.orders[product_name] = {"quantity": quantity, "price": price}
+        self.order_tree.insert("", "end", values=(product_name, quantity, f"${price:.2f}"))
 
     def delete_order(self):
-        ###########
+        selected_item = self.order_tree.selection()
+        if not selected_item:
+            messagebox.showerror("Error", "Seleccione un pedido para eliminar.")
+            return
 
-
-
+        item = self.order_tree.item(selected_item)
+        product_name = item["values"][0]
+        del self.orders[product_name]
+        self.order_tree.delete(selected_item)
 
     def generate_receipt(self):
         if not self.orders:
