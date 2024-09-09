@@ -142,18 +142,17 @@ class RestauranteApp(ctk.CTk):
                     break
 
             if can_add_product:
-                # Añadir botón con icono
+                # Añadir botón con icono en lugar de etiqueta separada
                 frame = ctk.CTkFrame(self.tab_pedidos)
                 frame.pack(pady=10, padx=10, fill="x")
 
-                button = ctk.CTkButton(frame, text=product, command=lambda p=product: self.add_order(p, 2.500))
-                button.pack(side="left")
-
-                # Añadir icono del producto
+                # Usar la imagen como parte del botón
                 if product in self.icons:
-                    icon_label = ctk.CTkLabel(frame, image=self.icons[product])
-                    icon_label.pack(side="left", padx=10)
-
+                    button = ctk.CTkButton(frame, text="", image=self.icons[product], command=lambda p=product: self.add_order(p, 2.500))
+                else:
+                    button = ctk.CTkButton(frame, text=product, command=lambda p=product: self.add_order(p, 2.500))
+            
+                button.pack(pady=5, padx=5, side="top", anchor="center")
 
     def create_orders_tab(self):
         ctk.CTkLabel(self.tab_pedidos, text="Gestión de Pedidos").pack(pady=10)
