@@ -7,20 +7,32 @@ Desarrollado por: **Rolando Castro** y **Nelson Quiñinao**
 
 ## 📝 Descripción
 
-Bienvenido a nuestro sistema de gestión para restaurantes, diseñado para optimizar la administración de ingredientes, stock, pedidos y generación de boletas. Con una interfaz gráfica intuitiva y funcionalidades dinámicas, este software proporciona una solución eficiente y práctica para la operación diaria de restaurantes.
+Este sistema de gestión para restaurantes permite una administración eficiente de ingredientes, stock, pedidos y la generación de boletas. Con una interfaz gráfica fácil de usar, el software optimiza la operación diaria de un restaurante.
 
-¡Echa un vistazo a este video para tener una idea [video de demostración](https://www.youtube.com/watch?v=VO07irdyyvs) y para ver el software en acción!
+🔗[video de demostración](https://www.youtube.com/watch?v=VO07irdyyvs) 
+
 
 ## 🍴 Menús Disponibles
 
 | Menú         | Precio | Ingredientes Necesarios                       |
 |--------------|--------|-----------------------------------------------|
-| Papas Fritas | $500   | 5 x papas                                     |
+| Papas Fritas | $500   | 2 x papas                                     |
 | Pepsi        | $1100  | 1 x bebida                                    |
-| Completo     | $1800  | 1x vienesa, 1x pan de completo, 1x tomate, 1x palta |
-| Hamburguesa  | $3500  | 1x pan de hamburguesa, 1x lámina de queso, 1x churrasco de carne |
+| Hotdog       | $1800  | 1 x salchicha, 1x pan                         |
+| Hamburguesa  | $3500  | 1x pan, 1x Carne                              |
 
-## 🥬 Ingreso de Ingredientes
+## 🥬 Funcionalidades Principales
+
+1. **Ingreso de Ingredientes**
+   - **Formulario de Ingreso**: Añadir ingredientes con nombre y cantidad.
+   - **Lista de Ingredientes**: Visualización de ingredientes y cantidades en stock .
+   - **Gestión de Stock**: Eliminar o actualizar ingredientes.
+   - **Generación de Menús**: Mostrar menús disponibles según el stock.
+
+2. **Gestion de Pedidos**
+   - **Selección de Menús**: Agregar menús al pedido según el stock disponible.
+   - **Eliminación de Menús**: Quitar menús del pedido y reponer ingredientes.
+   - **Generación de Boletas**: Crear boletas detalladas en PDF utilizando fpdf.
 
 ### Funcionalidades:
 
@@ -36,7 +48,7 @@ Bienvenido a nuestro sistema de gestión para restaurantes, diseñado para optim
 3. **Botón "Generar Menú"**:
    - Genera los menús disponibles según el stock de ingredientes. Si faltan ingredientes, notifica al usuario.
 
-### Validaciones:
+### 📑 Validaciones:
 - **Nombre del Ingrediente**: Solo acepta letras y espacios.
 - **Cantidad**: Debe ser un número entero positivo.
 
