@@ -141,34 +141,50 @@ class RestauranteApp(ctk.CTk):
                     can_add_product = False
                     break
 
-            if can_add_product:
-                # Añadir botón con icono en lugar de etiqueta separada
-                frame = ctk.CTkFrame(self.tab_pedidos)
-                frame.pack(pady=10, padx=10, fill="x")
 
-                # Usar la imagen como parte del botón
-                if product in self.icons:
-                    button = ctk.CTkButton(frame, text="", image=self.icons[product], command=lambda p=product: self.add_order(p, 2.500))
-                else:
-                    button = ctk.CTkButton(frame, text=product, command=lambda p=product: self.add_order(p, 2.500))
-            
-                button.pack(pady=5, padx=5, side="top", anchor="center")
 
     def create_orders_tab(self):
+        # Crear un Frame para los botones de los productos en la parte superior
+        self.product_buttons_frame = ctk.CTkFrame(self.tab_pedidos)
+        self.product_buttons_frame.pack(pady=10, padx=10, fill="x")
+
+        # Añadir los botones de productos en este frame
+        products_requirements = {
+            "Hamburguesa": {"Pan": 1, "Carne": 1},
+            "Papas Fritas": {"Papa": 2},
+            "Pepsi": {"Pepsi": 1},
+            "Hotdog": {"Pan": 1, "Salchicha": 1},
+        }
+
+        for product, _ in products_requirements.items():
+            # Crear un botón para cada producto
+            if product in self.icons:
+                button = ctk.CTkButton(self.product_buttons_frame, text="", image=self.icons[product], 
+                                   command=lambda p=product: self.add_order(p, 2.500))
+            else:
+                button = ctk.CTkButton(self.product_buttons_frame, text=product, 
+                                   command=lambda p=product: self.add_order(p, 2.500))
+
+            button.pack(side="left", padx=5, pady=5)  # Colocar los botones en línea horizontal
+
+        # Añadir un Label para separar los botones de la tabla de pedidos
         ctk.CTkLabel(self.tab_pedidos, text="Gestión de Pedidos").pack(pady=10)
 
+        # Crear el Treeview para los pedidos
         self.order_tree = ttk.Treeview(self.tab_pedidos, columns=("Producto", "Cantidad", "Precio"), show="headings")
         self.order_tree.heading("Producto", text="Producto")
         self.order_tree.heading("Cantidad", text="Cantidad")
         self.order_tree.heading("Precio", text="Precio")
         self.order_tree.pack(expand=1, fill="both", pady=10)
 
+        # Botón para eliminar pedidos
         self.delete_order_btn = ctk.CTkButton(self.tab_pedidos, text="Eliminar Pedido", command=self.delete_order)
         self.delete_order_btn.pack(pady=10)
 
+        # Botón para generar boleta
         self.generate_receipt_btn = ctk.CTkButton(self.tab_pedidos, text="Generar Boleta", command=self.generate_receipt)
         self.generate_receipt_btn.pack(pady=10)
-        
+
     def add_order(self, product_name, price):
         required_ingredients = {
             "Hamburguesa": {"Pan": 1, "Carne": 1},
