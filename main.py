@@ -193,6 +193,7 @@ class RestauranteApp(ctk.CTk):
             "Hotdog": {"Pan": 1, "Salchicha": 1},
         }
 
+    
         if product_name not in required_ingredients:
             return
 
@@ -201,15 +202,24 @@ class RestauranteApp(ctk.CTk):
                 messagebox.showerror("Error", f"No hay suficientes ingredientes para {product_name}.")
                 return
 
-        # Restar los ingredientes utilizados
         for ingredient, qty in required_ingredients[product_name].items():
             self.ingredients[ingredient] -= qty
 
-        # Agregar el pedido
-        quantity = 1
-        self.orders[product_name] = {"quantity": quantity, "price": price}
-        self.order_tree.insert("", "end", values=(product_name, quantity, f"${price:.2f}"))
 
+        if product_name in self.orders:
+            self.orders[product_name]["quantity"] += 1
+        else:
+            self.orders[product_name] = {"quantity": 1, "price": price}
+
+        
+        for item in self.order_tree.get_children():
+            self.order_tree.delete(item)
+
+        
+        for item, details in self.orders.items():
+            self.order_tree.insert("", "end", values=(item, details["quantity"], f"${details['price']:.2f}"))
+
+            
     def delete_order(self):
         selected_item = self.order_tree.selection()
         if not selected_item:
