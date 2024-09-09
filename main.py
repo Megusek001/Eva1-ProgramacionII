@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from tkinter import Listbox, messagebox, PhotoImage
+from tkinter import messagebox, PhotoImage
 from fpdf import FPDF
 from tkinter import ttk
 
@@ -33,7 +33,6 @@ class PDf(FPDF):
         return subtotal
 
 
-    #agregar el total de la boleta
     def add_total(self, total):
         self.cell(150, 10, 'Total', 1, 0, 'R')
         self.cell(40, 10, f'{total:.2f}', 1, 1, 'C')
@@ -46,6 +45,13 @@ class RestauranteApp(ctk.CTk):
         self.geometry("600x600")
         self.ingredients = {}
         self.orders = {}
+
+        self.icons = {
+            "Hamburguesa": PhotoImage(file="image/hamburguesa.png"),
+            "Papas Fritas": PhotoImage(file="image/papas.png"),
+            "Pepsi": PhotoImage(file="image/pepsi.png"),
+            "Hotdog": PhotoImage(file="image/hotdog.png")
+        }
 
         # Crear pestañas
         self.tabview = ctk.CTkTabview(self)
@@ -120,56 +126,47 @@ class RestauranteApp(ctk.CTk):
             messagebox.showerror("Error", "No hay ingredientes para generar el menú.")
             return
 
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font("monospace", size=12)
+        self.tabview.set("Pedidos") 
+        products_requirements = {
+            "Hamburguesa": {"Pan": 1, "Carne": 1},
+            "Papas Fritas": {"Papa": 2},
+            "Pepsi": {"Pepsi": 1},
+            "Hotdog": {"Pan": 1, "Salchicha": 1},
+        }
 
-        pdf.cell(200, 10, txt="Menú del Restaurante", ln=True, align='C')
-        pdf.ln(10)
+        for product, required_ingredients in products_requirements.items():
+            can_add_product = True
+            for ingredient, required_qty in required_ingredients.items():
+                if self.ingredients.get(ingredient, 0) < required_qty:
+                    can_add_product = False
+                    break
 
-        for name, quantity in self.ingredients.items():
-            pdf.cell(200, 10, txt=f"{name} - {quantity}", ln=True)
+            if can_add_product:
+                # Añadir botón con icono
+                frame = ctk.CTkFrame(self.tab_pedidos)
+                frame.pack(pady=10, padx=10, fill="x")
 
-        pdf.output("menu.pdf")
-        messagebox.showinfo("Generar Menú", "Menú generado correctamente como menu.pdf.")
+                button = ctk.CTkButton(frame, text=product, command=lambda p=product: self.add_order(p, 2.500))
+                button.pack(side="left")
+
+                # Añadir icono del producto
+                if product in self.icons:
+                    icon_label = ctk.CTkLabel(frame, image=self.icons[product])
+                    icon_label.pack(side="left", padx=10)
+
 
     def create_orders_tab(self):
         ctk.CTkLabel(self.tab_pedidos, text="Gestión de Pedidos").pack(pady=10)
 
-        # Cargar imágenes para los botones
-        self.hamburger_icon = PhotoImage(file="image/hamburguesa.png")
-        self.fries_icon = PhotoImage(file="image/papas.png")  
-        self.pepsi_icon = PhotoImage(file="image/pepsi.png")  
-        self.hotdog_icon = PhotoImage(file="image/hotdog.png")  
-
-        # Botones con iconos
-        self.add_hamburger_btn = ctk.CTkButton(self.tab_pedidos, image=self.hamburger_icon, text="Hamburguesa", command=lambda: self.add_order("Hamburguesa", 2.500))
-        self.add_hamburger_btn.pack(pady=10)
-
-        self.add_fries_btn = ctk.CTkButton(self.tab_pedidos, image=self.fries_icon, text="Papas Fritas", command=lambda: self.add_order("Papas Fritas", 1.500))
-        self.add_fries_btn.pack(pady=10)
-
-        self.add_pepsi_btn = ctk.CTkButton(self.tab_pedidos, image=self.pepsi_icon, text="Pepsi", command=lambda: self.add_order("Pepsi", 1.200))
-        self.add_pepsi_btn.pack(pady=10)
-
-        self.add_hotdog_btn = ctk.CTkButton(self.tab_pedidos, image=self.hotdog_icon, text="Hotdog", command=lambda: self.add_order("Hotdog",2.000))
-        self.add_hotdog_btn.pack(pady=10)
-
-        self.order_listbox = Listbox(self.tab_pedidos, selectmode="single")
-        self.order_listbox.pack(expand=1, fill="both", pady=10)
-
-        # Botón para generar boleta
-        self.generate_receipt_btn = ctk.CTkButton(self.tab_pedidos, text="Generar Boleta", command=self.generate_receipt)
-        self.generate_receipt_btn.pack(pady=10)
-
+        #########
     def add_order(self, item_name, price):
-        quantity = 1  # Se puede ajustar según necesidad
-        if item_name in self.orders:
-            self.orders[item_name]["quantity"] += quantity
-        else:
-            self.orders[item_name] = {"quantity": quantity, "price": price}
+        ##########
 
-        self.order_listbox.insert("end", f"{item_name} - {quantity}")
+    def delete_order(self):
+        ###########
+
+
+
 
     def generate_receipt(self):
         if not self.orders:
@@ -178,18 +175,17 @@ class RestauranteApp(ctk.CTk):
 
         pdf = PDf()
         pdf.add_page()
-        
         pdf.add_table_header()
+        
+        
         total = 0
-
         for item, details in self.orders.items():
             subtotal = pdf.add_product(item, details["quantity"], details["price"])
             total += subtotal
 
         pdf.add_total(total)    
-
-        pdf.output("Boleta-Pedido.pdf")
-        messagebox.showinfo("Generar Boleta", "Boleta generada correctamente como boleta-pedido.pdf.")
+        pdf.output("Boleta.pdf")
+        messagebox.showinfo("Éxito", "Boleta generada exitosamente.")
 
 if __name__ == "__main__":
     app = RestauranteApp()
