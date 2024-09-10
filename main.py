@@ -277,7 +277,7 @@ class RestauranteApp(ctk.CTk):
 
 
 
-##ventana para ingresar rut---
+##ventana para ingresar rut##
     def ask_client_rut(self):
         rut = ctk.CTkInputDialog(text="Ingrese el RUT del Cliente:", title="RUT del Cliente").get_input()
         if rut:

@@ -70,6 +70,10 @@ La pestaña de "Pedido" permite gestionar los menús según los ingredientes dis
    - **Treeview**: Desglose del pedido con nombre, cantidad y precio unitario.
    - **Botón "Generar Boleta"**: Crea una boleta en PDF del pedido actual, utilizando la librería `fpdf`.
 
+### Imagen de Boleta de referencia
+![Boleta genrada con todos los productos](image/a.png)
+
+
 ### Interacción:
 - **Agregar Menús**: Selecciona menús disponibles según el stock y agrégalos al pedido.
 - **Eliminar Menús**: Reintegra ingredientes al stock al eliminar un menú del pedido.
