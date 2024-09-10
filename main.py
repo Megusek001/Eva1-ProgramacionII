@@ -236,17 +236,20 @@ class RestauranteApp(ctk.CTk):
             messagebox.showerror("Error", "No hay pedidos para generar la boleta.")
             return
 
-        pdf = PDf()
+        # Preguntar el RUT del cliente antes de generar la boleta
+        self.ask_client_rut()
+
+        pdf = PDF()
+        pdf.set_client_info(self.client_rut)  # Pasar la información del RUT al PDF
         pdf.add_page()
         pdf.add_table_header()
-        
-        
+
         total = 0
         for item, details in self.orders.items():
             subtotal = pdf.add_product(item, details["quantity"], details["price"])
             total += subtotal
 
-        pdf.add_total(total)    
+        pdf.add_total(total)
         pdf.output("Boleta.pdf")
         messagebox.showinfo("Éxito", "Boleta generada exitosamente.")
 
