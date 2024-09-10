@@ -231,6 +231,13 @@ class RestauranteApp(ctk.CTk):
         del self.orders[product_name]
         self.order_tree.delete(selected_item)
 
+
+    def ask_client_rut(self):
+        # Ventana para ingresar el RUT del cliente
+        rut = ctk.CTkInputDialog(text="Ingrese el RUT del Cliente:", title="RUT del Cliente").get_input()
+        if rut:
+            self.client_rut = rut
+
     def generate_receipt(self):
         if not self.orders:
             messagebox.showerror("Error", "No hay pedidos para generar la boleta.")
