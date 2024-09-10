@@ -8,19 +8,19 @@ class PDF(FPDF):
     def header(self):
         self.set_font('Arial', 'B', 16)
         self.cell(0, 10, 'Boleta de Pedido', 0, 1, 'C')
-        self.ln(10)  # Espacio adicional después del encabezado
+        self.ln(10)  
 
-        # Añadir información del cliente si está disponible
+        
         if hasattr(self, 'rut'):
             self.set_font('Arial', 'I', 12)
             self.cell(0, 10, f'RUT : {self.rut}', 0, 1, 'L')
             self.cell(0, 10, f'Fecha: {self.date}', 0, 1, 'L')
             self.cell(0, 10, f'Hora: {self.time}', 0, 1, 'L')
-            self.ln(5)  # Espacio entre la información del cliente y el encabezado de la tabla
+            self.ln(5)  
         else:
             self.set_font('Arial', 'I', 12)
             self.cell(0, 10, 'RUT del Cliente: No disponible', 0, 1, 'L')
-            self.ln(10)  # Espacio entre la información del cliente y el encabezado de la tabla
+            self.ln(10) 
 
     def footer(self):
         self.set_y(-15)
@@ -33,7 +33,7 @@ class PDF(FPDF):
         self.cell(30, 10, 'Cantidad', 1, 0, 'C')
         self.cell(40, 10, 'Precio Unitario', 1, 0, 'C')
         self.cell(40, 10, 'Subtotal', 1, 1, 'C')
-        self.ln(5)  # Espacio después del encabezado de la tabla
+        self.ln(5)  
 
     def add_product(self, product, quantity, price):
         self.set_font('Arial', '', 12)
@@ -45,7 +45,7 @@ class PDF(FPDF):
         return subtotal
 
     def add_total(self, total):
-        self.ln(5)  # Espacio antes del total
+        self.ln(5)   
         self.set_font('Arial', 'B', 12)
         iva = total * 0.19
         total_con_iva = total + iva
@@ -78,7 +78,7 @@ class RestauranteApp(ctk.CTk):
             "Hotdog": PhotoImage(file="image/hotdog.png")
         }
 
-        # Crear pestañas
+
         self.tabview = ctk.CTkTabview(self)
         self.tabview.pack(expand=1, fill="both")
 
@@ -104,15 +104,19 @@ class RestauranteApp(ctk.CTk):
         self.generate_menu_btn = ctk.CTkButton(self.tab_ingredientes, text="Generar Menú", command=self.generate_menu)
         self.generate_menu_btn.grid(row=4, column=0, padx=10, pady=10, sticky="w")
 
-        # Crear y ubicar el Treeview para mostrar ingredientes
+        
         self.ingredient_tree = ttk.Treeview(self.tab_ingredientes, columns=("Nombre", "Cantidad"), show="headings")
         self.ingredient_tree.heading("Nombre", text="Nombre")
         self.ingredient_tree.heading("Cantidad", text="Cantidad")
         self.ingredient_tree.grid(row=0, column=1, rowspan=5, padx=10, pady=10, sticky="nsew")
 
-        # Configurar la distribución del espacio
+        
         self.tab_ingredientes.grid_columnconfigure(1, weight=1)
         self.tab_ingredientes.grid_rowconfigure(0, weight=1)
+
+
+
+
 
     def add_ingredient(self):
         name = self.ingredient_name_entry.get()
@@ -135,6 +139,10 @@ class RestauranteApp(ctk.CTk):
         self.ingredient_name_entry.delete(0, "end")
         self.ingredient_qty_entry.delete(0, "end")
 
+
+
+
+
     def delete_ingredient(self):
         selected_item = self.ingredient_tree.selection()
         if not selected_item:
@@ -145,6 +153,10 @@ class RestauranteApp(ctk.CTk):
         name = item["values"][0]
         del self.ingredients[name]
         self.ingredient_tree.delete(selected_item)
+
+
+
+
 
     def generate_menu(self):
         if not self.ingredients:
@@ -210,6 +222,10 @@ class RestauranteApp(ctk.CTk):
         self.generate_receipt_btn = ctk.CTkButton(self.tab_pedidos, text="Generar Boleta", command=self.generate_receipt)
         self.generate_receipt_btn.pack(pady=10)
 
+
+
+
+
     def add_order(self, product_name, price):
         required_ingredients = {
             "Hamburguesa": {"Pan": 1, "Carne": 1},
@@ -244,7 +260,10 @@ class RestauranteApp(ctk.CTk):
         for item, details in self.orders.items():
             self.order_tree.insert("", "end", values=(item, details["quantity"], f"${details['price']:.2f}"))
 
-            
+
+
+
+
     def delete_order(self):
         selected_item = self.order_tree.selection()
         if not selected_item:
@@ -257,8 +276,9 @@ class RestauranteApp(ctk.CTk):
         self.order_tree.delete(selected_item)
 
 
+
+##ventana para ingresar rut---
     def ask_client_rut(self):
-        # Ventana para ingresar el RUT del cliente
         rut = ctk.CTkInputDialog(text="Ingrese el RUT del Cliente:", title="RUT del Cliente").get_input()
         if rut:
             self.client_rut = rut
