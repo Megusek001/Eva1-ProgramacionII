@@ -10,7 +10,6 @@ class PDF(FPDF):
         self.cell(0, 10, 'Boleta de Pedido', 0, 1, 'C')
         self.ln(10)  
 
-        
         if hasattr(self, 'rut'):
             self.set_font('Arial', 'I', 12)
             self.cell(0, 10, f'RUT : {self.rut}', 0, 1, 'L')
@@ -70,6 +69,14 @@ class RestauranteApp(ctk.CTk):
         self.geometry("600x600")
         self.ingredients = {}
         self.orders = {}
+        
+        # Definición de precios para cada producto
+        self.product_prices = {
+            "Hamburguesa": 2.500,
+            "Papas Fritas": 1.500,
+            "Pepsi": 1.200,
+            "Hotdog": 2.000
+        }
 
         self.icons = {
             "Hamburguesa": PhotoImage(file="image/hamburguesa.png"),
@@ -77,7 +84,6 @@ class RestauranteApp(ctk.CTk):
             "Pepsi": PhotoImage(file="image/pepsi.png"),
             "Hotdog": PhotoImage(file="image/hotdog.png")
         }
-
 
         self.tabview = ctk.CTkTabview(self)
         self.tabview.pack(expand=1, fill="both")
@@ -104,19 +110,13 @@ class RestauranteApp(ctk.CTk):
         self.generate_menu_btn = ctk.CTkButton(self.tab_ingredientes, text="Generar Menú", command=self.generate_menu)
         self.generate_menu_btn.grid(row=4, column=0, padx=10, pady=10, sticky="w")
 
-        
         self.ingredient_tree = ttk.Treeview(self.tab_ingredientes, columns=("Nombre", "Cantidad"), show="headings")
         self.ingredient_tree.heading("Nombre", text="Nombre")
         self.ingredient_tree.heading("Cantidad", text="Cantidad")
         self.ingredient_tree.grid(row=0, column=1, rowspan=5, padx=10, pady=10, sticky="nsew")
 
-        
         self.tab_ingredientes.grid_columnconfigure(1, weight=1)
         self.tab_ingredientes.grid_rowconfigure(0, weight=1)
-
-
-
-
 
     def add_ingredient(self):
         name = self.ingredient_name_entry.get()
@@ -131,17 +131,13 @@ class RestauranteApp(ctk.CTk):
             if quantity <= 0:
                 raise ValueError
         except ValueError:
-            messagebox.showerror("Error", "La cantidad debe ser un numero positivo.")
+            messagebox.showerror("Error", "La cantidad debe ser un número positivo.")
             return
 
         self.ingredients[name] = quantity
         self.ingredient_tree.insert("", "end", values=(name, quantity))
         self.ingredient_name_entry.delete(0, "end")
         self.ingredient_qty_entry.delete(0, "end")
-
-
-
-
 
     def delete_ingredient(self):
         selected_item = self.ingredient_tree.selection()
@@ -153,10 +149,6 @@ class RestauranteApp(ctk.CTk):
         name = item["values"][0]
         del self.ingredients[name]
         self.ingredient_tree.delete(selected_item)
-
-
-
-
 
     def generate_menu(self):
         if not self.ingredients:
@@ -178,14 +170,10 @@ class RestauranteApp(ctk.CTk):
                     can_add_product = False
                     break
 
-
-
     def create_orders_tab(self):
-        # Crear un Frame para los botones de los productos en la parte superior
         self.product_buttons_frame = ctk.CTkFrame(self.tab_pedidos)
         self.product_buttons_frame.pack(pady=10, padx=10, fill="x")
 
-        # Añadir los botones de productos en este frame
         products_requirements = {
             "Hamburguesa": {"Pan": 1, "Carne": 1},
             "Papas Fritas": {"Papa": 2},
@@ -194,39 +182,30 @@ class RestauranteApp(ctk.CTk):
         }
 
         for product, _ in products_requirements.items():
-            # Crear un botón para cada producto
             if product in self.icons:
                 button = ctk.CTkButton(self.product_buttons_frame, text="", image=self.icons[product], 
-                                   command=lambda p=product: self.add_order(p, 2.500))
+                                   command=lambda p=product: self.add_order(p))
             else:
                 button = ctk.CTkButton(self.product_buttons_frame, text=product, 
-                                   command=lambda p=product: self.add_order(p, 2.500))
+                                   command=lambda p=product: self.add_order(p))
 
-            button.pack(side="left", padx=5, pady=5)  # Colocar los botones en línea horizontal
+            button.pack(side="left", padx=5, pady=5)
 
-        # Añadir un Label para separar los botones de la tabla de pedidos
         ctk.CTkLabel(self.tab_pedidos, text="Gestión de Pedidos").pack(pady=10)
 
-        # Crear el Treeview para los pedidos
         self.order_tree = ttk.Treeview(self.tab_pedidos, columns=("Producto", "Cantidad", "Precio"), show="headings")
         self.order_tree.heading("Producto", text="Producto")
         self.order_tree.heading("Cantidad", text="Cantidad")
         self.order_tree.heading("Precio", text="Precio")
         self.order_tree.pack(expand=1, fill="both", pady=10)
 
-        # Botón para eliminar pedidos
         self.delete_order_btn = ctk.CTkButton(self.tab_pedidos, text="Eliminar Pedido", command=self.delete_order)
         self.delete_order_btn.pack(pady=10)
 
-        # Botón para generar boleta
         self.generate_receipt_btn = ctk.CTkButton(self.tab_pedidos, text="Generar Boleta", command=self.generate_receipt)
         self.generate_receipt_btn.pack(pady=10)
 
-
-
-
-
-    def add_order(self, product_name, price):
+    def add_order(self, product_name):
         required_ingredients = {
             "Hamburguesa": {"Pan": 1, "Carne": 1},
             "Papas Fritas": {"Papa": 2},
@@ -234,7 +213,6 @@ class RestauranteApp(ctk.CTk):
             "Hotdog": {"Pan": 1, "Salchicha": 1},
         }
 
-    
         if product_name not in required_ingredients:
             return
 
@@ -246,23 +224,18 @@ class RestauranteApp(ctk.CTk):
         for ingredient, qty in required_ingredients[product_name].items():
             self.ingredients[ingredient] -= qty
 
+        price = self.product_prices.get(product_name, 2.500)  # Precio predeterminado si no está en el diccionario
 
         if product_name in self.orders:
             self.orders[product_name]["quantity"] += 1
         else:
             self.orders[product_name] = {"quantity": 1, "price": price}
 
-        
         for item in self.order_tree.get_children():
             self.order_tree.delete(item)
 
-        
         for item, details in self.orders.items():
             self.order_tree.insert("", "end", values=(item, details["quantity"], f"${details['price']:.2f}"))
-
-
-
-
 
     def delete_order(self):
         selected_item = self.order_tree.selection()
@@ -275,9 +248,6 @@ class RestauranteApp(ctk.CTk):
         del self.orders[product_name]
         self.order_tree.delete(selected_item)
 
-
-
-##ventana para ingresar rut##
     def ask_client_rut(self):
         rut = ctk.CTkInputDialog(text="Ingrese el RUT del Cliente:", title="RUT del Cliente").get_input()
         if rut:
@@ -288,11 +258,10 @@ class RestauranteApp(ctk.CTk):
             messagebox.showerror("Error", "No hay pedidos para generar la boleta.")
             return
 
-        # Preguntar el RUT del cliente antes de generar la boleta
         self.ask_client_rut()
 
         pdf = PDF()
-        pdf.set_client_info(self.client_rut)  # Pasar la información del RUT al PDF
+        pdf.set_client_info(self.client_rut)
         pdf.add_page()
         pdf.add_table_header()
 
