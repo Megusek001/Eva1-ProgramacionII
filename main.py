@@ -1,27 +1,39 @@
 import customtkinter as ctk
+from datetime import datetime
 from tkinter import messagebox, PhotoImage
 from fpdf import FPDF
 from tkinter import ttk
 
-class PDf(FPDF):
+class PDF(FPDF):
     def header(self):
-        self.set_font('Arial', 'B', 12)
-        self.cell(0, 10, 'Boleta de pedido', 0, 1, 'C')
-        self.ln(10)
+        self.set_font('Arial', 'B', 16)
+        self.cell(0, 10, 'Boleta de Pedido', 0, 1, 'C')
+        self.ln(10)  # Espacio adicional después del encabezado
+
+        # Añadir información del cliente si está disponible
+        if hasattr(self, 'rut'):
+            self.set_font('Arial', 'I', 12)
+            self.cell(0, 10, f'RUT : {self.rut}', 0, 1, 'L')
+            self.cell(0, 10, f'Fecha: {self.date}', 0, 1, 'L')
+            self.cell(0, 10, f'Hora: {self.time}', 0, 1, 'L')
+            self.ln(5)  # Espacio entre la información del cliente y el encabezado de la tabla
+        else:
+            self.set_font('Arial', 'I', 12)
+            self.cell(0, 10, 'RUT del Cliente: No disponible', 0, 1, 'L')
+            self.ln(10)  # Espacio entre la información del cliente y el encabezado de la tabla
 
     def footer(self):
         self.set_y(-15)
-        self.set_font('Arial','I', 8)
-        self.cell(0, 10, f'Pagina{self.page_no()}', 0, 0, 'C')
+        self.set_font('Arial', 'I', 8)
+        self.cell(0, 10, f'Página {self.page_no()}', 0, 0, 'C')
 
     def add_table_header(self):
-        self.set_font('Arial', 'I', 8)
         self.set_font('Arial', 'B', 12)
         self.cell(80, 10, 'Producto', 1)
         self.cell(30, 10, 'Cantidad', 1, 0, 'C')
         self.cell(40, 10, 'Precio Unitario', 1, 0, 'C')
         self.cell(40, 10, 'Subtotal', 1, 1, 'C')
-
+        self.ln(5)  # Espacio después del encabezado de la tabla
 
     def add_product(self, product, quantity, price):
         self.set_font('Arial', '', 12)
@@ -32,10 +44,23 @@ class PDf(FPDF):
         self.cell(40, 10, f'{subtotal:.2f}', 1, 1, 'C')
         return subtotal
 
-
     def add_total(self, total):
-        self.cell(150, 10, 'Total', 1, 0, 'R')
+        self.ln(5)  # Espacio antes del total
+        self.set_font('Arial', 'B', 12)
+        iva = total * 0.19
+        total_con_iva = total + iva
+        self.cell(150, 10, 'Subtotal', 1, 0, 'R')
         self.cell(40, 10, f'{total:.2f}', 1, 1, 'C')
+        self.cell(150, 10, 'IVA (19%)', 1, 0, 'R')
+        self.cell(40, 10, f'{iva:.2f}', 1, 1, 'C')
+        self.cell(150, 10, 'Total', 1, 0, 'R')
+        self.cell(40, 10, f'{total_con_iva:.2f}', 1, 1, 'C')
+
+    def set_client_info(self, rut):
+        self.rut = rut
+        now = datetime.now()
+        self.date = now.strftime('%d/%m/%Y')
+        self.time = now.strftime('%H:%M:%S')
 
 
 class RestauranteApp(ctk.CTk):
